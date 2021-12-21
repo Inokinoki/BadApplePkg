@@ -1,0 +1,53 @@
+## @file
+#  Brief Description of UEFI Bad Apple
+#  
+#  Detailed Description of UEFI Bad Apple
+#
+#  Copyright for UEFI Bad Apple
+#  
+#  License for UEFI Bad Apple
+#  
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = BadApple
+  FILE_GUID                      = 476c4715-27f0-4f4c-b732-c5276cef7fa0 #Copy and paste the GUID from http://www.guidgen.com/ here
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC Etc...
+#
+
+[Sources]
+  HelloWorld.c
+  
+  
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+  
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  FileHandleLib
+  UefiHiiServicesLib
+  ShellLib
+  BmpSupportLib
+  SafeIntLib
+  DebugLib
+
+[Guids]
+
+[Ppis]
+
+#[Protocols]
+#  gEfiSimpleTextInputExProtocolGuid
+
+[FeaturePcd]
+
+[Pcd]
