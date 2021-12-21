@@ -189,7 +189,7 @@ UefiMain (
     }
     // Read as little endian
     DecodedInt32 = ((Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0]);
-    Print(L"Read %d bytes: 0x%04X.\n", ReadLength, DecodedInt32);
+    // Print(L"Read %d bytes: 0x%04X.\n", ReadLength, DecodedInt32);
     if (EFI_ERROR(Status)) {
       Print(L"Read file failed at %d.\n", i);
       goto Cleanup;
@@ -198,20 +198,31 @@ UefiMain (
       if ((DecodedInt32 & 0x7FFF7FFF) == 0x7FFF7FFF) {
         // Keep frame and do not refresh
         NeedRefresh = 0;
-        Print(L"Not need refresh at %d.\n", i);
+        // Print(L"Not need refresh at %d.\n", i);
       } else {
-        Print(L"Patching at %d.\n", i);
-        goto Cleanup;
+        // Print(L"Patching at %d.\n", i);
         do {
-          // UINTN PatchX = ((DecodedInt32 & 0x7FFF0000) >> 16), PatchY = (DecodedInt32 & 0x7FFF);
+          UINTN PatchX = ((DecodedInt32 & 0x7FFF0000) >> 16), PatchY = (DecodedInt32 & 0x7FFF);
           // TODO: Begin patch until 0xFFFFFFFF
+          if (PatchX < VIDEO_WIDTH && PatchY <= VIDEO_HEIGHT) {
+            EFI_GRAPHICS_OUTPUT_BLT_PIXEL *PickedPixel = (DrawBuffer + PatchY * VIDEO_WIDTH + PatchX);
+            if (PickedPixel->Red > 128) {
+              PickedPixel->Blue = 0;
+              PickedPixel->Green = 0;
+              PickedPixel->Red = 0;
+            } else {
+              PickedPixel->Blue = 255;
+              PickedPixel->Green = 255;
+              PickedPixel->Red = 255;
+            }
+          }
 
           // Read next
           ReadLength = 4;
           Status = ShellReadFile(BABinFileHandle, &ReadLength, (void *)Buffer);
           // Read as little endian
           DecodedInt32 = ((Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0]);
-          Print(L"Read %d bytes: 0x%04X.\n", ReadLength, DecodedInt32);
+          // Print(L"Read %d bytes: 0x%04X.\n", ReadLength, DecodedInt32);
         } while ((DecodedInt32 & 0x7FFF7FFF) != 0x7FFF7FFF);
       }
     } else {
