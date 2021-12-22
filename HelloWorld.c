@@ -202,18 +202,28 @@ UefiMain (
       } else {
         // Print(L"Patching at %d.\n", i);
         do {
-          UINTN PatchX = ((DecodedInt32 & 0x7FFF0000) >> 16), PatchY = (DecodedInt32 & 0x7FFF);
-          // TODO: Begin patch until 0xFFFFFFFF
+          UINTN PatchX = ((DecodedInt32 & 0x0FFF0000) >> 16), PatchY = (DecodedInt32 & 0x7FFF);
+          UINTN GrayScale = ((DecodedInt32 & 0x70000000) >> 28);
+          // Begin patch until 0xFFFFFFFF
           if (PatchX < VIDEO_WIDTH && PatchY <= VIDEO_HEIGHT) {
             EFI_GRAPHICS_OUTPUT_BLT_PIXEL *PickedPixel = (DrawBuffer + PatchY * VIDEO_WIDTH + PatchX);
-            if (PickedPixel->Red > 128) {
+            switch (GrayScale)
+            {
+            case 0:
               PickedPixel->Blue = 0;
               PickedPixel->Green = 0;
               PickedPixel->Red = 0;
-            } else {
+              break;
+            case 7:
               PickedPixel->Blue = 255;
               PickedPixel->Green = 255;
               PickedPixel->Red = 255;
+              break;
+            default:
+              PickedPixel->Blue = 32 * GrayScale;
+              PickedPixel->Green = 32 * GrayScale;
+              PickedPixel->Red = 32 * GrayScale;
+              break;
             }
           }
 
@@ -227,7 +237,7 @@ UefiMain (
       }
     } else {
       // Read one intra-frame
-      Print(L"Print key frame %d at %d.\n", intraFrameIndex, i);
+      // Print(L"Print key frame %d at %d.\n", intraFrameIndex, i);
       DrawBuffer = intraFrames[intraFrameIndex++];
     }
 
